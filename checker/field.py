@@ -1,6 +1,6 @@
 from fishwebsdk.checker.base import Base as FieldBase
 from fishwebsdk.checker import validator
-import time
+import time, json
 
 
 """
@@ -70,3 +70,15 @@ class TimeField(FieldBase):
         t = time.mktime(time.strptime(data, self.stype))
         return time.strftime(self.dtype, time.localtime(t))
 
+
+class JsonStringField(FieldBase):
+    """
+    将python对象转换为Json字符串
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+    
+    def to_python(self, data):
+        if not isinstance(data, (list, dict)):
+            raise Exception("is not json")
+        return json.dumps(data, ensure_ascii=False)
