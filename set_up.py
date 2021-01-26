@@ -4,6 +4,25 @@ from threading import Lock
 import os
 
 
+"""
+fishwebsdk_config 结构如下:
+
+fishwebsdk_config = {
+    'log_config':{
+        'simple_log_path': 'simple_log.log',
+        'log_level': 1,
+        'log_path': 'log.log',
+    },
+    'mysql_config':{
+        'label_one': {
+            'connect_string': 'mysql+pymysql://root:123456@localhost:3306/test?charset=utf8',
+            'kwargs': {'pool_size': 1, 'pool_timeout': 60, 'pool_recycle': 3600, 'pool_pre_ping': True, 'echo': False},
+        },
+    },
+}
+"""
+
+
 _set_up_lock = Lock()
 _already_set_up = False
 

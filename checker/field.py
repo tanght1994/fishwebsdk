@@ -8,6 +8,7 @@ import time, json
 sname：数据来名
 dname：数据去名
 not_allow_values：本字段不允许的值
+allow_values：允许的值
 default：默认值，如果default不为None，则即使原数据中没有此字段，也不error
 """
 
@@ -85,18 +86,28 @@ class JsonStringField(FieldBase):
 
 
 class ListField(FieldBase):
-    def __init__(self, item_field, **kwargs):
+    def __init__(self, item_field, strict=False, **kwargs):
+        """
+        验证list类型，对list中的每一个元素使用item_field进行验证
+        item_field: 元素验证器，可以是任意Field类型，也可以是Checker类型
+        strict: 严格模式，如果是True，则列表中的元素只要有一个不符合，就认为这个字段不符合要求
+                如果是False，则不报错，但是只保留通过验证的元素
+        """
         super().__init__(**kwargs)
         self.item_field = item_field
+        self.strict = strict
     
     def to_python(self, data):
-        if not isinstance(data, (list, tuple, set)):
+        if not isinstance(data, list):
             data = [data]
         result = []
         for i in data:
             self.item_field.reset()
             self.item_field.clean(i)
             if self.item_field.error:
-                raise Exception(self.item_field.error)
+                if self.strict:
+                    raise Exception(self.item_field.error)
+                else:
+                    continue
             result.append(self.item_field.value)
         return result

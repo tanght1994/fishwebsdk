@@ -1,0 +1,1 @@
+from fishwebsdk.checker.checker import Checker
