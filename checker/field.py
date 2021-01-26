@@ -82,3 +82,21 @@ class JsonStringField(FieldBase):
         if not isinstance(data, (list, dict)):
             raise Exception("is not json")
         return json.dumps(data, ensure_ascii=False)
+
+
+class ListField(FieldBase):
+    def __init__(self, item_field, **kwargs):
+        super().__init__(**kwargs)
+        self.item_field = item_field
+    
+    def to_python(self, data):
+        if not isinstance(data, (list, tuple, set)):
+            data = [data]
+        result = []
+        for i in data:
+            self.item_field.reset()
+            self.item_field.clean(i)
+            if self.item_field.error:
+                raise Exception(self.item_field.error)
+            result.append(self.item_field.value)
+        return result

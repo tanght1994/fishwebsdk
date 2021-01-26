@@ -14,3 +14,11 @@ class Checker(Base):
             if not field.is_valid():
                 raise Exception(field.error)
         return {field.name: field.value for field in self.fields}
+    
+    def reset(self):
+        # reset自己的成员变量
+        super().reset()
+
+        # 调用所有字段的reset
+        for field in self.fields:
+            field.reset()

@@ -96,3 +96,9 @@ class Base:
         except Exception as e:
             field_name = self.sname if self.sname == self.dname else f'{self.sname}->{self.dname}'
             self.error = f'{{"{field_name}":{str(e)}}}'
+    
+    def reset(self):
+        self.clean_data = None
+        self.error = None
+        self.already_clean = False
+        
