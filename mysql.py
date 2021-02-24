@@ -88,6 +88,21 @@ class Session():
         # pylint: enable=no-member
 
 
+def insert_on_duplicate_key_update(session, table, data: dict):
+    """
+    插入数据，遇到主键冲突时，更新除主键外的所有数据为data中对应的数据
+    注意，当使用 ON DUPLICATE KEY UPDATE 语句时，可能会造成‘自增字段不连续’
+    可以通过修改mysql的配置来解决‘自增字段不连续’的问题，但是会影响mysql性能
+    详细信息请查询mysql官方文档
+    """
+    from sqlalchemy.dialects.mysql import insert
+    insert_stmt = insert(table).values(**data)
+    on_duplicate_key_stmt = insert_stmt.on_duplicate_key_update(**data)
+    # pylint: disable=no-member
+    session.execute(on_duplicate_key_stmt)
+    # pylint: enable=no-member
+
+
 def set_up(mysql_config: dict, log_fun=_nothing):
     """
     功能: 创建数据库引擎，制作数据库结构映射
