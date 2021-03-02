@@ -84,7 +84,10 @@ class Base:
 
         try:
             # 转换为本field所需要的类型
-            python_value = self.to_python(mydata) if mydata else None
+            try:
+                python_value = self.to_python(mydata) if mydata else None
+            except Exception:
+                python_value = None
 
             # 验证是否是允许的值，如果是不允许的值，则用default代替
             if self.is_not_allow_value(python_value):
@@ -102,6 +105,6 @@ class Base:
             # 返回  清理后的数据, error
             return python_value, None
         except Exception as e:
-            field_name = self.sname if self.sname == self.dname else f'{self.sname}_{self.dname}'
+            field_name = self.sname if self.sname == self.dname else f'{self.sname}-{self.dname}'
             err_msg = f'{{"{field_name}":{str(e)}}}' if field_name != '' else str(e)
             return None, err_msg
