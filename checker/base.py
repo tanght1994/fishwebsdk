@@ -86,8 +86,11 @@ class Base:
             # 转换为本field所需要的类型
             try:
                 python_value = self.to_python(mydata) if mydata else None
-            except Exception:
-                python_value = None
+            except Exception as e:
+                if self._default is not None:
+                    python_value = None
+                else:
+                    raise e
 
             # 验证是否是允许的值，如果是不允许的值，则用default代替
             if self.is_not_allow_value(python_value):
