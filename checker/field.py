@@ -10,6 +10,7 @@ dname：数据去名
 not_allow_values：本字段不允许的值
 allow_values：允许的值
 default：默认值，如果default不为None，则即使原数据中没有此字段，也不error
+validators：用户自定义的验证器
 """
 
 
@@ -17,11 +18,11 @@ class CharField(FieldBase):
     def __init__(self, max_len=None, min_len=None, choice_list=None, **kwargs):
         super().__init__(**kwargs)
         if max_len:
-            self.validators.append(validator.max_len_validator(int(max_len)))
+            self.add_validators(validator.max_len_validator(int(max_len)))
         if min_len:
-            self.validators.append(validator.min_len_validator(int(min_len)))
+            self.add_validators(validator.min_len_validator(int(min_len)))
         if choice_list:
-            self.validators.append(validator.choice_validator(choice_list))
+            self.add_validators(validator.choice_validator(choice_list))
 
     def to_python(self, data):
         return str(data)
@@ -31,11 +32,11 @@ class IntField(FieldBase):
     def __init__(self, max_val=None, min_val=None, choice_list=None, **kwargs):
         super().__init__(**kwargs)
         if max_val:
-            self.validators.append(validator.max_val_validator(max_val))
+            self.add_validators(validator.max_val_validator(max_val))
         if min_val:
-            self.validators.append(validator.min_val_validator(min_val))
+            self.add_validators(validator.min_val_validator(min_val))
         if choice_list:
-            self.validators.append(validator.choice_validator(choice_list))
+            self.add_validators(validator.choice_validator(choice_list))
     
     def to_python(self, data):
         return int(data)
@@ -45,11 +46,11 @@ class FloatField(FieldBase):
     def __init__(self, max_val=None, min_val=None, choice_list=None, **kwargs):
         super().__init__(**kwargs)
         if max_val:
-            self.validators.append(validator.max_val_validator(max_val))
+            self.add_validators(validator.max_val_validator(max_val))
         if min_val:
-            self.validators.append(validator.min_val_validator(min_val))
+            self.add_validators(validator.min_val_validator(min_val))
         if choice_list:
-            self.validators.append(validator.choice_validator(choice_list))
+            self.add_validators(validator.choice_validator(choice_list))
     
     def to_python(self, data):
         return float(data)
@@ -102,12 +103,11 @@ class ListField(FieldBase):
             data = [data]
         result = []
         for i in data:
-            self.item_field.reset()
-            self.item_field.clean(i)
-            if self.item_field.error:
+            cleaned_data, error = self.item_field.clean(i)
+            if error:
                 if self.strict:
-                    raise Exception(self.item_field.error)
+                    raise Exception(error)
                 else:
                     continue
-            result.append(self.item_field.value)
+            result.append(cleaned_data)
         return result
