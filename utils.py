@@ -3,6 +3,10 @@ import socket
 import struct
 
 
+def __nothing(*args, **kwargs):
+    pass
+
+
 def get_strtime(value=0):
     """
     1.获得字符串形式的时间
